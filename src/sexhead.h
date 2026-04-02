@@ -59,7 +59,7 @@ keystruct	headkey[] = {
   {"SEXPXSCL", "Pixel scale used for measurements (arcsec)",
 	&thefield1.pixscale, H_EXPO, T_DOUBLE, "%-15G"},
   {"SEXSFWHM", "Source FWHM used for measurements (arcsec)",
-	&prefs.seeing_fwhm, H_EXPO, T_DOUBLE, "%-13G"},
+	&prefs.seeing_fwhm[0], H_EXPO, T_DOUBLE, "%-13G"},
   {"SEXNNWF ", "S/G classification NNW filename",
 	thecat.nnw_name, H_STRING, T_STRING, "%-18s"},
   {"SEXGAIN ", "Gain used (e-/ADU)",

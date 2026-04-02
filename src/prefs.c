@@ -663,7 +663,7 @@ void	useprefs()
     prefs.dpsf_flag = 1;
 
 /*-------------------------- Tracking the PSF FWHM --------------------------*/
-  if (prefs.seeing_fwhm == 0 && (FLAG(obj2.sprob) || FLAG(obj2.fwhm_psf)))
+  if (prefs.seeing_fwhm[0] == 0 && (FLAG(obj2.sprob) || FLAG(obj2.fwhm_psf)))
     prefs.psf_flag = 1;
 
 /*-------------------------- Pattern-fitting -------------------------------*/

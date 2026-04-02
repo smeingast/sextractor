@@ -622,11 +622,11 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
       }
 
 /* ---------------------- Star/Galaxy classification -----------------------*/
-    if (FLAG(obj2.fwhm_psf) || (FLAG(obj2.sprob) && prefs.seeing_fwhm==0.0))
+    if (FLAG(obj2.fwhm_psf) || (FLAG(obj2.sprob) && prefs.seeing_fwhm[0]==0.0))
       {
-      obj2->fwhm_psf = (prefs.seeing_fwhm==0.0)?
+      obj2->fwhm_psf = (prefs.seeing_fwhm[0]==0.0)?
 				psf_fwhm(thepsf)*field->pixscale
-				: prefs.seeing_fwhm;
+				: prefs.seeing_fwhm[0];
       if (FLAG(obj2.fwhmw_psf))
         obj2->fwhmw_psf = obj2->fwhm_psf * (prefs.pixel_scale?
 		field->pixscale/3600.0 : sqrt(obj2->pixscale2));
@@ -635,20 +635,24 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
     if (FLAG(obj2.sprob))
       {
        double	fac2, input[10], output, fwhm;
+       int	s;
 
-      fwhm = (prefs.seeing_fwhm==0.0)? obj2->fwhm_psf : prefs.seeing_fwhm;
-
-      fac2 = fwhm/field->pixscale;
-      fac2 *= fac2;
-      input[j=0] = log10(obj->iso[0]? obj->iso[0]/fac2: 0.01);
-      input[++j] = field->thresh>0.0?
-		  log10(obj->peak>0.0? obj->peak/field->thresh: 0.1)
-		 :-1.0;
-      for (i=1; i<NISO; i++)
-        input[++j] = log10(obj->iso[i]? obj->iso[i]/fac2: 0.01);
-      input[++j] = log10(fwhm);
-      neurresp(input, &output);
-      obj2->sprob = (float)output;
+      for (s=0; s<prefs.nseeing_fwhm; s++)
+        {
+        fwhm = (prefs.seeing_fwhm[s]==0.0)?
+		obj2->fwhm_psf : prefs.seeing_fwhm[s];
+        fac2 = fwhm/field->pixscale;
+        fac2 *= fac2;
+        input[j=0] = log10(obj->iso[0]? obj->iso[0]/fac2: 0.01);
+        input[++j] = field->thresh>0.0?
+		    log10(obj->peak>0.0? obj->peak/field->thresh: 0.1)
+		   :-1.0;
+        for (i=1; i<NISO; i++)
+          input[++j] = log10(obj->iso[i]? obj->iso[i]/fac2: 0.01);
+        input[++j] = log10(fwhm);
+        neurresp(input, &output);
+        obj2->sprob[s] = (float)output;
+        }
       }
 
 /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/

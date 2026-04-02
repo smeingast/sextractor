@@ -54,7 +54,7 @@ keystruct	headkey1[] = {
   {"SEXPIXS", "PIXEL SCALE (ARCSEC)",
 	&thefield1.pixscale, H_EXPO, T_DOUBLE, "%12G"},
   {"SEXSFWHM", "SEEING FWHM (ARCSEC)",
-	&prefs.seeing_fwhm, H_EXPO, T_DOUBLE, "%12G"},
+	&prefs.seeing_fwhm[0], H_EXPO, T_DOUBLE, "%12G"},
   {"SEXNNWF ", "CLASSIFICATION NNW FILENAME",
 	thecat.nnw_name, H_STRING, T_STRING, "%18s"},
   {"SEXGAIN ", "GAIN (IN E- PER ADU)",

@@ -62,6 +62,7 @@
 #define	MAXNAPER		32		/* max. number of apertures */
 #define	MAXNASSOC		32		/* max. number of assoc. */
 #define	MAXPICSIZE		1048576		/* max. image size */
+#define	MAXNSEEING		32		/* max. nb of seeing values */
 #define	NISO			8		/* number of isophotes */
 #define	OUTPUT			stderr		/* where all msgs are sent */
 #define PSF_NPSFMAX		9		/* Max number of fitted PSFs */

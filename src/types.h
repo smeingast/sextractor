@@ -214,7 +214,7 @@ typedef struct
   float		ellip;				/* ellipticity */
   float		polar;				/* Kaiser's "polarization" */
   float		polarw;				/* WORLD "polarization" */
-  float		sprob;				/* Stellarity index */
+  float		*sprob;				/* Stellarity index vector */
   float		fwhmw;				/* WORLD FWHM */
   double	*assoc;				/* ASSOCiated data */
   int		assoc_number;			/* nb of ASSOCiated objects */

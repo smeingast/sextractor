@@ -242,7 +242,8 @@ void	makeit()
     NFPRINTF(OUTPUT, "Initializing Neural Network");
     neurinit();
     NFPRINTF(OUTPUT, "Reading Neural Network Weights");
-    getnnw(); 
+    getnnw();
+    changecatparamarrays("CLASS_STAR", &prefs.nseeing_fwhm, 1);
     }
 
   if (prefs.somfit_flag)

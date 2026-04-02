@@ -116,7 +116,9 @@ typedef struct
   char		gain_key[8];				/* gain keyword */
 /*----- S/G separation */
   double	pixel_scale;				/* in arcsec */
-  double	seeing_fwhm;				/* in arcsec */
+  double	seeing_fwhm[MAXNSEEING];		/* in arcsec */
+  int		nseeing_fwhm;				/* nb of seeing values */
+  int		seeing_fwhmsize;			/* CLASS_STAR vector size */
   char		nnw_name[MAXCHAR];			/* nnw filename */
 /*----- background */
   enum	{IMAGE, AFILE}			back_origin;	/* origin of bkgnd */
