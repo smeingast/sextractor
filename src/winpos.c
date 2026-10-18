@@ -186,14 +186,11 @@ void	compute_winpos(picstruct *field, picstruct *wfield,
   var = backnoise2 = field->backsig*field->backsig;
   invgain = field->gain>0.0? 1.0/field->gain : 0.0;
   sig = obj2->hl_radius*2.0/2.35; /* From half-FWHM to sigma */
-/* Optional cap of the window at the local stellar size (WINPOS_SIGMAP) and
-   at a global value (WINPOS_SIGMAX) */
+/* Optional cap of the window at the local stellar size (WINPOS_SIGMAP) */
   {
    double	sigcap = winpos_sigcap(obj2->posx, obj2->posy);
   if (sigcap > 0.0 && sig > sigcap)
     sig = sigcap;
-  if (prefs.winpos_sigmax > 0.0 && sig > prefs.winpos_sigmax)
-    sig = prefs.winpos_sigmax;
   }
   invtwosig2 = 1.0/(2.0*sig*sig);
 
