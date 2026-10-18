@@ -55,6 +55,7 @@
 #include	"profit.h"
 #include	"som.h"
 #include	"weight.h"
+#include	"winpos.h"
 #include	"xml.h"
 
 static int		selectext(char *filename);
@@ -291,6 +292,9 @@ void	makeit()
     }
 
   thecat.next = next;
+
+/*-- Load the optional map of the maximum WIN window sigma */
+  init_winpos_sigmap(next);
 
 /*-- Init the CHECK-images */
   if (prefs.check_flag)
@@ -635,6 +639,8 @@ void	makeit()
 
   if (prefs.growth_flag)
     endgrowth();
+
+  end_winpos_sigmap();
 
 #ifdef USE_MODEL
   if (prefs.prof_flag)

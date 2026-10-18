@@ -36,11 +36,107 @@
 
 #include	<math.h>
 #include	<stdlib.h>
+#include	<string.h>
 
 #include	"define.h"
 #include	"globals.h"
 #include	"prefs.h"
 #include	"winpos.h"
+
+#ifdef HAVE_CFITSIO
+#include CFITSIO_H
+#endif
+
+/* Optional map of the maximum window sigma (WINPOS_SIGMAP). The map is a coarse
+   image; its pixel (1-based) for image pixel (x, y) (1-based) is
+   (WPAX*x + WPBX, WPAY*y + WPBY), rounded to the nearest pixel. Values <= 0 or
+   non-finite, and positions outside the map, mean "no cap". */
+static float	*winpos_map = NULL;
+static long	winpos_mapnx = 0, winpos_mapny = 0;
+static double	winpos_ax = 1.0, winpos_bx = 0.0, winpos_ay = 1.0, winpos_by = 0.0;
+
+
+/****** init_winpos_sigmap ****************************************************
+PROTO	void init_winpos_sigmap(int next)
+PURPOSE	Load the WINPOS_SIGMAP map, if set.
+INPUT	Number of valid image extensions (the map serves one image only).
+OUTPUT	-.
+***/
+void	init_winpos_sigmap(int next)
+  {
+#ifdef HAVE_CFITSIO
+   fitsfile	*fptr;
+   long		naxes[2];
+   int		status = 0, naxis = 0, anynul = 0;
+#endif
+
+  if (!*prefs.winpos_sigmap_name || !strcmp(prefs.winpos_sigmap_name, "NONE"))
+    return;
+  if (next > 1)
+    error(EXIT_FAILURE, "*Error*: WINPOS_SIGMAP supports single-extension images only",
+	"");
+#ifdef HAVE_CFITSIO
+  fits_open_file(&fptr, prefs.winpos_sigmap_name, READONLY, &status);
+  fits_get_img_dim(fptr, &naxis, &status);
+  fits_get_img_size(fptr, 2, naxes, &status);
+  fits_read_key(fptr, TDOUBLE, "WPAX", &winpos_ax, NULL, &status);
+  fits_read_key(fptr, TDOUBLE, "WPBX", &winpos_bx, NULL, &status);
+  fits_read_key(fptr, TDOUBLE, "WPAY", &winpos_ay, NULL, &status);
+  fits_read_key(fptr, TDOUBLE, "WPBY", &winpos_by, NULL, &status);
+  if (status || naxis != 2)
+    error(EXIT_FAILURE, "*Error*: cannot read WINPOS_SIGMAP (2D image with WPAX/WPBX/"
+	"WPAY/WPBY keywords) ", prefs.winpos_sigmap_name);
+  winpos_mapnx = naxes[0];
+  winpos_mapny = naxes[1];
+  if (!(winpos_map = malloc((size_t)winpos_mapnx*winpos_mapny*sizeof(float))))
+    error(EXIT_FAILURE, "*Error*: not enough memory for ", prefs.winpos_sigmap_name);
+  fits_read_img(fptr, TFLOAT, 1, winpos_mapnx*winpos_mapny, NULL, winpos_map,
+	&anynul, &status);
+  fits_close_file(fptr, &status);
+  if (status)
+    error(EXIT_FAILURE, "*Error*: cannot read the data of ", prefs.winpos_sigmap_name);
+#else
+  error(EXIT_FAILURE, "*Error*: WINPOS_SIGMAP needs SExtractor built with CFITSIO",
+	"");
+#endif
+  return;
+  }
+
+
+/****** end_winpos_sigmap *****************************************************
+PROTO	void end_winpos_sigmap(void)
+PURPOSE	Free the WINPOS_SIGMAP map.
+***/
+void	end_winpos_sigmap(void)
+  {
+  free(winpos_map);
+  winpos_map = NULL;
+  winpos_mapnx = winpos_mapny = 0;
+  return;
+  }
+
+
+/****** winpos_sigcap *********************************************************
+PROTO	double winpos_sigcap(double x, double y)
+PURPOSE	Maximum window sigma at an image position (1-based pixels).
+OUTPUT	The cap in pixels, or 0 for "no cap".
+***/
+double	winpos_sigcap(double x, double y)
+  {
+   double	mx, my, v;
+   long		ix, iy;
+
+  if (!winpos_map)
+    return 0.0;
+  mx = winpos_ax*x + winpos_bx;
+  my = winpos_ay*y + winpos_by;
+  if (!(mx >= 0.5 && my >= 0.5 && mx < winpos_mapnx+0.5 && my < winpos_mapny+0.5))
+    return 0.0;
+  ix = (long)(mx + 0.5) - 1;
+  iy = (long)(my + 0.5) - 1;
+  v = (double)winpos_map[iy*winpos_mapnx + ix];
+  return (v > 0.0 && v < 1e30)? v : 0.0;	/* NaN fails v > 0 */
+  }
 
 static  obj2struct	*obj2 = &outobj2;
 
@@ -90,6 +186,15 @@ void	compute_winpos(picstruct *field, picstruct *wfield,
   var = backnoise2 = field->backsig*field->backsig;
   invgain = field->gain>0.0? 1.0/field->gain : 0.0;
   sig = obj2->hl_radius*2.0/2.35; /* From half-FWHM to sigma */
+/* Optional cap of the window at the local stellar size (WINPOS_SIGMAP) and
+   at a global value (WINPOS_SIGMAX) */
+  {
+   double	sigcap = winpos_sigcap(obj2->posx, obj2->posy);
+  if (sigcap > 0.0 && sig > sigcap)
+    sig = sigcap;
+  if (prefs.winpos_sigmax > 0.0 && sig > prefs.winpos_sigmax)
+    sig = prefs.winpos_sigmax;
+  }
   invtwosig2 = 1.0/(2.0*sig*sig);
 
 /* Integration radius */

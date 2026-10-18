@@ -42,5 +42,8 @@ One must have:
 */
 
 /*------------------------------- functions ---------------------------------*/
+extern void	init_winpos_sigmap(int next),
+		end_winpos_sigmap(void);
+extern double	winpos_sigcap(double x, double y);
 extern void	compute_winpos(picstruct *field, picstruct *wfield,
 			       picstruct *dgeofield, objstruct *obj);

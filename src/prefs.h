@@ -116,6 +116,8 @@ typedef struct
   char		gain_key[8];				/* gain keyword */
 /*----- S/G separation */
   double	pixel_scale;				/* in arcsec */
+  double	winpos_sigmax;				/* max. WIN window sigma (pix), 0=off */
+  char		winpos_sigmap_name[MAXCHAR];		/* map of max. WIN sigma, NONE=off */
   double	seeing_fwhm[MAXNSEEING];		/* in arcsec */
   int		nseeing_fwhm;				/* nb of seeing values */
   int		seeing_fwhmsize;			/* CLASS_STAR vector size */

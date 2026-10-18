@@ -144,6 +144,8 @@
   {"PHOT_PETROPARAMS", P_FLOATLIST, prefs.petroparam, 0,0, 0.0,10.0,
    {""}, 2,2, &prefs.npetroparam},
   {"PIXEL_SCALE", P_FLOAT, &prefs.pixel_scale, 0,0, 0.0, 1e+10},
+  {"WINPOS_SIGMAX", P_FLOAT, &prefs.winpos_sigmax, 0,0, 0.0, 1e+10},
+  {"WINPOS_SIGMAP", P_STRING, prefs.winpos_sigmap_name},
   {"PSF_NAME", P_STRINGLIST, prefs.psf_name, 0,0, 0.0,0.0,
    {""}, 1, 2, &prefs.npsf_name},	/*?*/
   {"PSF_NMAX", P_INT, &prefs.psf_npsfmax, 1, PSF_NPSFMAX},
@@ -252,6 +254,8 @@ char *default_prefs[] =
 "GAIN             0.0            # detector gain in e-/ADU",
 "GAIN_KEY         GAIN           # keyword for detector gain in e-/ADU",
 "PIXEL_SCALE      1.0            # size of pixel in arcsec (0=use FITS WCS info)",
+"*WINPOS_SIGMAX   0.0            # max. WIN window sigma in pixels (0 = no cap)",
+"*WINPOS_SIGMAP   NONE           # FITS map of the max. WIN window sigma (pixels)",
 " ",
 "#------------------------- Star/Galaxy Separation ----------------------------",
 " ",
